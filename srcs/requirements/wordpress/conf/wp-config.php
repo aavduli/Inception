@@ -17,5 +17,5 @@ define('NONCE_SALT',       '&{ew<_In#g<4L 8iR[[DmE>_+OE$|J+xa$ZS}rXR5S;w+;AbU+jp
 
 $table_prefix = 'wp_';
 define('WP_DEBUG', false);
-if (!defined('ABSPATH')) define('ABSPATH', dirname(_FILE__) . '/');
-require_once('ABSPATH' . 'wp-settings.php');
+if (!defined('ABSPATH')) define('ABSPATH', dirname(__FILE__) . '/');
+require_once(ABSPATH . 'wp-settings.php');
