@@ -1,8 +1,15 @@
-# DOCKERFILE
-FROM mariadb:11.1
+FROM debian:bullseye
 
-# Set environment variables (these get overriden by docker-compose)
-ENV MARIADB_ROOT_PASSWORD=root_password
+RUN apt-get update -y && \
+	apt-get install -y mariadb-server && \
+	mkdir -p /run/mysqld && \
+	chown -R mysql:mysql /run/mysqld
 
-# Copy the init SQL script
-COPY ./conf/init.sql /docker-entrypoint-initdb.d/
+COPY ./tools/script.sh /tmp/script.sh
+
+RUN chmod +x /tmp/script.sh
+
+RUN sed -i "s/127.0.0.1/0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf
+
+ENTRYPOINT [ "bash", "/tmp/script.sh" ]
+
