@@ -1,33 +1,37 @@
-#!/bin/bash
+# Use consistent path
+WP_PATH="/var/www/html"
 
-sleep 10
+# Wait for DB
+until mysqladmin ping -h"$MARIADB_HOST" -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" --silent; do
+	sleep 1
+done
 
-if [ ! -f /var/www/html/wp-config.php ]; then
-	wp config create --dbname=$database_name --dbuser=$mysql_user \
-		--dbpass=$mysql_password --dbhost=$mysql_host --allow-root --skip-check
+if [ ! -f "$WP_PATH/wp-config.php" ]; then
+  echo "Downloading WordPress..."
+  wp core download --path="$WP_PATH" --allow-root
 
-	wp core install --url=$domain_name --title=$brand --admin_user=$wordpress_admin \
-		--admin_password=$wordpress_admin_password --admin_email=$wordpress_admin_email \
-		--allow-root
-
-	wp user create $login $wp_user_email --role=author --user_pass=$wp_user_pwd --allow-root
-
-	wp config set FORCE_SSL_ADMIN 'false' --allow-root
-	
-	wp config set WP_REDIS_HOST $redis_host --allow-root
-	
-	wp config set WP_REDIS_PORT $redis_port --allow-root
-
-	wp config set WP_CACHE 'true' --allow-root
-
-	wp plugin install redis-cache --allow-root
-	
-	wp plugin activate redis-cache --allow-root
-
-	wp redis enable --allow-root
-
-	chmod 777 /var/www/wp-content
-
+  echo "Creating wp-config.php..."
+  wp config create \
+    --dbname="$MARIADB_DATABASE" \
+    --dbuser="$MARIADB_USER" \
+    --dbpass="$MARIADB_PASSWORD" \
+    --dbhost="$MARIADB_HOST" \
+    --path="$WP_PATH" \
+    --allow-root \
+    --skip-check
 fi
 
-/usr/sbin/php-fpm7.4 -F
+chmod -R 755 "$WP_PATH/wp-content" || echo "wp-content not found, skipping chmod"
+
+if ! wp core is-installed --path="$WP_PATH" --allow-root; then
+  wp core install \
+    --url="$WP_URL" \
+    --title="$WP_TITLE" \
+    --admin_user="$WP_ADMIN" \
+    --admin_password="$WP_ADMIN_PWD" \
+    --admin_email="$WP_ADMIN_EMAIL" \
+    --path="$WP_PATH" \
+    --allow-root
+fi
+
+exec php-fpm8.2 -F

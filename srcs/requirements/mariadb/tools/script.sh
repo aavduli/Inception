@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+set -e
+
 # Create run directory for MariaDB socket
 mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld
@@ -16,15 +19,15 @@ sleep 5  # wait for mysqld to be ready
 
 # Run SQL setup
 mysql -u root <<EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MARIADB_ROOT_PASSWORD}';
 CREATE DATABASE IF NOT EXISTS \`${MARIADB_DATABASE}\`;
 CREATE USER IF NOT EXISTS '${MARIADB_USER}'@'%' IDENTIFIED BY '${MARIADB_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`${MARIADB_DATABASE}\`.* TO '${MARIADB_USER}'@'%';
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${MARIADB_ROOT_PASSWORD}';
 FLUSH PRIVILEGES;
 EOF
 
 # Shutdown temporary server
-mysqladmin -u root -p${mysql_root_password} shutdown
+mysqladmin -uroot -p"${MARIADB_ROOT_PASSWORD}" shutdown
 
 # Start MariaDB in foreground
 exec mysqld_safe

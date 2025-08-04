@@ -1,32 +1,36 @@
-FROM debian:bullseye
+FROM debian:12.11
 
-RUN apt-get update && apt-get upgrade && apt-get install -y \
-	php-fpm \
-	php-mysql \
-	php-zip \
-	php-redis \
-	curl \
-	vim && \
-	sed -i -e 's/lister=.*/listen = 9000/g' /etc/php/7.4/fpm/pool.d/www.conf
-	#sed -i -e 's/;listen.owner = www-data/listen.owner = www-data/g' /etc/php/7.4/fpm/pool.d/www.conf && \
-    #sed -i -e 's/;listen.group = www-data/listen.group = www-data/g' /etc/php/7.4/fpm/pool.d/www.conf && \
-    #sed -i -e 's/;listen.mode = 0660/listen.mode = 0660/g' /etc/php/7.4/fpm/pool.d/www.conf && \
-    #sed -i -e 's/;clear_env = no/clear_env = no/g' /etc/php/7.4/fpm/pool.d/www.conf && \
-    #sed -i -e 's/;catch_workers_output = yes/catch_workers_output = yes/g' /etc/php/7.4/fpm/pool.d/www.conf && \
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y \
+        mariadb-client \
+        php \
+        php-fpm \
+        php-mysql \
+        php-zip \
+        php-curl \
+        php-redis \
+        sendmail \
+        curl \
+        vim && \
+    mkdir -p /run/php
 
-RUN apt-get install -y sendmail
-RUN mkdir -p /run/php
+# 🔧 Make PHP-FPM listen on TCP port 9000
+RUN sed -i 's|^listen = .*|listen = 9000|' /etc/php/*/fpm/pool.d/www.conf
 
+# Set working directory
 WORKDIR /var/www/html
 RUN chown -R www-data:www-data /var/www/html
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
-	chmod +x wp-cli.phar && \
-	mv wp-cli.phar /usr/local/bin/wp
 
+# Install wp-cli
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x wp-cli.phar && \
+    mv wp-cli.phar /usr/local/bin/wp
+
+# Download WordPress
 RUN wp core download --allow-root
 
-COPY ./tools/entrypoint.sh .
+# Copy entrypoint
+COPY ./tools/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-RUN chmod +x entrypoint.sh
-
-ENTRYPOINT [ "bash", "entrypoint.sh" ]
+ENTRYPOINT ["bash", "/entrypoint.sh"]
