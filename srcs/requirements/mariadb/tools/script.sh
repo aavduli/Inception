@@ -14,7 +14,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 fi
 
 # Start MariaDB temporarily in background to run setup SQL
-mysqld_safe --skip-networking &
+mysqld --skip-networking &
 sleep 5  # wait for mysqld to be ready
 
 # Run SQL setup
