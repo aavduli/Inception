@@ -3,6 +3,7 @@ FROM debian:12.11
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y \
         mariadb-client \
+		netcat-openbsd \
         php \
         php-fpm \
         php-mysql \
@@ -13,6 +14,7 @@ RUN apt-get update && apt-get upgrade -y && \
         curl \
         vim && \
     mkdir -p /run/php
+
 
 # 🔧 Make PHP-FPM listen on TCP port 9000
 RUN sed -i 's|^listen = .*|listen = 9000|' /etc/php/*/fpm/pool.d/www.conf

@@ -1,9 +1,10 @@
-# Use consistent path
+#!/bin/bash
 WP_PATH="/var/www/html"
 
-# Wait for DB
-until mysqladmin ping -h"$MARIADB_HOST" -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" --silent; do
-	sleep 1
+
+until nc -z "$MARIADB_HOST" 3306; do
+	echo "waiting for MARIADB..."
+	sleep 2
 done
 
 if [ ! -f "$WP_PATH/wp-config.php" ]; then

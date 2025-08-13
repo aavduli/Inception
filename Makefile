@@ -1,27 +1,21 @@
 NAME=inception
 SRC_DIR=srcs
-VOLUME_WORDPRESS=$(SRC_DIR)/data/wordpress
-VOLUME_MARIADB=$(SRC_DIR)/data/mariadb
 
-.PHONY = all up down clean fclean re volumes
+.PHONY: all up down clean fclean re
 
-all: volumes
-	docker-compose -f $(SRC_DIR)/docker-compose.yml up --build -d
+all: up
 
 up:
-	docker-compose -f $(SRC_DIR)/docker-compose.yml up -d
+	docker-compose -f $(SRC_DIR)/docker-compose.yml up --build -d
+
 down:
-	docker-compose -f $(SRC_DIR)/docker-compose.yml down 
-clean : down
-	docker volume rm wordpress || true
-	docker volume rm mariadb || true
+	docker-compose -f $(SRC_DIR)/docker-compose.yml down
+
+clean: down
+	docker volume rm wordpress_data || true
+	docker volume rm mariadb_data || true
 
 fclean: clean
-	rm -rf $(VOLUME_WORDPRESS)
-	rm -rf $(VOLUME_MARIADB)
-
-volumes:
-	mkdir -p $(VOLUME_WORDPRESS)
-	mkdir -p $(VOLUME_MARIADB)
+	# no folders to remove anymore
 
 re: fclean all
