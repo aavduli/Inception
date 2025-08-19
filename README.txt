@@ -9,3 +9,6 @@ usermod -d /home/aavduli -m aavduli #update home path.
 groupmod -n aavduli boss #update grp name
 
 then exit
+
+to copy files :
+scp -P 2222 ~/Documents/Inception aavduli@<VP_IP>:/home/aavduli
