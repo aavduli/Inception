@@ -12,8 +12,8 @@ down:
 	docker-compose -f $(SRC_DIR)/docker-compose.yml down
 
 clean: down
-	docker volume rm wordpress_data || true
-	docker volume rm mariadb_data || true
+	docker volume rm ~/home/aavduli/data/wordpress_data || true
+	docker volume rm ~/home/aavduli/data/mariadb_data || true
 
 fclean: clean
 	# no folders to remove anymore

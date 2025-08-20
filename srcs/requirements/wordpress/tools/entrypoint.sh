@@ -35,4 +35,8 @@ if ! wp core is-installed --path="$WP_PATH" --allow-root; then
     --allow-root
 fi
 
+wp option update comments_notify 0 --allow-root
+wp option update moderation_notify 0 --allow-root
+wp option update enable_xmlrpc 0 --allow-root
+
 exec php-fpm8.2 -F
