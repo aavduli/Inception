@@ -26,18 +26,21 @@ chmod -R 755 "$WP_PATH/wp-content" || echo "wp-content not found, skipping chmod
 
 if ! wp core is-installed --path="$WP_PATH" --allow-root; then
 	wp core install \
-    --url="$WP_URL" \
-    --title="$WP_TITLE" \
-    --admin_user="$WP_ADMIN" \
-    --admin_password="$WP_ADMIN_PWD" \
-    --admin_email="$WP_ADMIN_EMAIL" \
-    --path="$WP_PATH" \
-    --allow-root
+		--url="$WP_URL" \
+		--title="$WP_TITLE" \
+		--admin_user="$WP_ADMIN" \
+		--admin_password="$WP_ADMIN_PWD" \
+		--admin_email="$WP_ADMIN_EMAIL" \
+		--path="$WP_PATH" \
+    	--allow-root
+fi
 
-	wp user create ${WP_USER} ${WP_USER_EMAIL} \
-	--role=author \
-	--user_pass=${WP_USER_PWD} \
-	--path=/var/www/html --allow-root
+if ! wp user get "$WP_USER" --path="$WP_PATH" --allow-root; then
+	wp user create "$WP_USER" "$WP_USER_EMAIL" \
+		--role=author \
+		--user_pass="$WP_USER_PWD" \
+		--path="$WP_PATH" \
+		--allow-root
 fi
 
 wp option update comments_notify 0 --allow-root

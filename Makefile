@@ -12,10 +12,9 @@ down:
 	docker-compose -f $(SRC_DIR)/docker-compose.yml down
 
 clean: down
-	docker system prune -af --volumes
 	sudo rm -rf /home/aavduli/data/
 
 fclean: clean
-	# no folders to remove anymore
+	docker system prune -af --volumes
 
 re: fclean all
