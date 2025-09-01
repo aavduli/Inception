@@ -12,3 +12,8 @@ then exit
 
 to copy files :
 scp -P 2222 ~/Documents/Inception aavduli@<VP_IP>:/home/aavduli
+
+
+connect to mysql: 
+
+docker exec -it mariadb mysql -u root -p
